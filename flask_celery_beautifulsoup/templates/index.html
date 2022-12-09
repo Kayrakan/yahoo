@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% for messages in get_flashed_messages() %}
+<h2>{{ messages }}</h2>
+{% endfor %}
+{%  if form_submitted %}
+<meta id="taskid" data-name="{{task_id}}">
+<h5>
+  <p>file_name: {{ file_name }}</p> <br>
+  <p>task_id = {{task_id}}</p>
+</h5>
+<h1 style="text-align: center;" class="title">
+  You have initiated scraping yahoo. <br>
+  <p><a href="{{ url_for('xlsx_download', filename=file_name, task_id=task_id ) }}">Click to download</a></p>
+</h1>
+
+<div style="text-align: center;" class="title" id="content">.<span id="loading"></span></div>
+
+
+{% else %}
+<form name="kw_form" onsubmit="required()" action="{{ url_for('scrape_yahoo') }}", method="POST">
+  <div class="form-group row">
+    <label for="file_name" class="col-4 col-form-label">Enter a file name</label>
+    <div  style="margin-bottom: 5px" class="col-8">
+      <input id="file_name" name="file_name" type="text" class="form-control" maxlength="30" onkeydown="return /[a-z\_]/i.test(event.key)" required>
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="offset-7 col-8">
+      <button name="submit" type="submit" class="btn btn-primary">Scrape Yahoo</button>
+    </div>
+  </div>
+</form>{% endif %}
+
+{% endblock %}
