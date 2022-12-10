@@ -20,40 +20,17 @@ class YahooScraper():
 
     def do_request(self, path=None, method="GET", params=None, headers=None, payload=None):
 
-        if method == "POST":
-            try:
-                response = self.session.post(
+        try:
+            response = self.session.request(
 
-                    path, data=payload, headers=headers,
-                )
-                response.raise_for_status()
-            except requests.exceptions.HTTPError as errh:
-                return errh.response
-            except requests.exceptions.ConnectionError as errc:
-                print(errc.response)
-                return errc.response
-            except requests.exceptions.Timeout as errt:
-                return errt.response
-            except requests.exceptions.RequestException as err:
-                return err.response
+                method, path, data=payload, headers=headers, params=params
+            )
 
-        else:
-            try:
-                response = self.session.get(
-
-                    path, headers=self.session.headers, params=params
-                )
-                response.raise_for_status()
-            except requests.exceptions.HTTPError as errh:
-                return errh.response
-            except requests.exceptions.ConnectionError as errc:
-                return errc.response
-            except requests.exceptions.Timeout as errt:
-                return errt.response
-            except requests.exceptions.RequestException as err:
-                return err.response
+        except Exception as e:
+            return e
 
         return response
+
 
     def get_item_info(self, html_data, index=0):
         data_len = len(html_data)
@@ -124,14 +101,9 @@ class YahooScraper():
         from requests.structures import CaseInsensitiveDict
 
         now = datetime.today()
-        print(f'now : {now}')
         start_of_month = now.replace(day=1)
-        print(f"start {start_of_month}")
         end_date = now.strftime('%s')
-        print(f'now : {now}')
         start_of_month = start_of_month.strftime('%s')
-        print(f"start {start_of_month}")
-
 
         url = f"https://query1.finance.yahoo.com/v7/finance/download/{symbol}?period1={start_of_month}&period2={end_date}&interval=1d&events=history&includeAdjustedClose=true"
 
@@ -147,7 +119,6 @@ class YahooScraper():
         resp = requests.get(url, headers=headers)
         resp = resp.content
         rawData = pd.read_csv(io.StringIO(resp.decode('utf-8')))
-        print(rawData)
         csv_name = re.sub(r'[^a-zA-Z]', '', symbol)
         today = now.date().strftime("%Y_%m_%d")
 

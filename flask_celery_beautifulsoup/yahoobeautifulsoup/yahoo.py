@@ -10,51 +10,29 @@ import numpy as np
 class YahooScraper():
 
 
-    async def do_async_request(self,base_url, endpoint,headers={}, body={}, params={}, method="GET"):
+    async def do_async_request(self,base_url, endpoint,headers=None, body=None, params=None, method="GET"):
 
-        if method == "GET":
-            url = f'{base_url}{endpoint}'
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(url,headers= headers, params=params) as resp:
-                        try:
-                            if resp.status == 200:
-                                print('200')
-                                response = await resp.read()
-                                return response
+        url = f'{base_url}{endpoint}'
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.request(method,url,headers= headers,data=body, params=params) as resp:
+                    try:
+                        if resp.status == 200:
+                            print('200')
+                            response = await resp.read()
+                            return response
+                        else:
+                            if resp.status == 404:
+                                print('There is a problem with the request URL. Make sure that it is correct')
                             else:
-                                if resp.status == 404:
-                                    print('There is a problem with the request URL. Make sure that it is correct')
-                                else:
-                                    print('There was a problem retrieving data: ', resp.status)
-                                return None
-                        except Exception as e:
-                            print(f'an error occured during the get request: {e}')
+                                print('There was a problem retrieving data: ', resp.status)
                             return None
-            except asyncio.TimeoutError as e:
-                print(e)
-                return None
-
-        elif method == "POST":
-            url = f'{base_url}{endpoint}'
-            print(url)
-
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.post(url,headers= headers, data=body) as resp:
-                        try:
-                            if resp.status == 200:
-                                response = await resp.read()
-                                return response
-                            else:
-                                return None
-                        except Exception as e:
-                            print(f'an error occured during the post request: {e}')
-                            return None
-            except asyncio.TimeoutError:
-                print('timeout error')
-                return None
-
+                    except Exception as e:
+                        print(f'an error occured during the get request: {e}')
+                        return None
+        except asyncio.TimeoutError as e:
+            print(e)
+            return None
 
     def get_item_info(self,html_data, index=0):
         data_len = len(html_data)
