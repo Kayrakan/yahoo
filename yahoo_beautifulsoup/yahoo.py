@@ -20,16 +20,8 @@ class YahooScraper():
 
     def do_request(self, path=None, method="GET", params=None, headers=None, payload=None):
 
-        try:
-            response = self.session.request(
+        return self.session.request( method, path, data=payload, headers=headers, params=params )
 
-                method, path, data=payload, headers=headers, params=params
-            )
-
-        except Exception as e:
-            return e
-
-        return response
 
 
     def get_item_info(self, html_data, index=0):
